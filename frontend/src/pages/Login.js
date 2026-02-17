@@ -3,11 +3,13 @@ import { useNavigate } from 'react-router-dom';
 import { toast } from 'react-toastify';
 import { useAuth } from '../context/AuthContext';
 import { adminLogin } from '../services/api';
+import { Activity, Mail, Lock, Shield, CheckCircle, Key } from 'lucide-react';
 
 const Login = () => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [loading, setLoading] = useState(false);
+  const [rememberMe, setRememberMe] = useState(false);
   const navigate = useNavigate();
   const { login } = useAuth();
 
@@ -36,36 +38,91 @@ const Login = () => {
 
   return (
     <div className="login-container">
+      {/* Branding Section */}
+      <div className="login-branding">
+        <div className="login-logo">
+          <Activity />
+        </div>
+        <h1>Clinical Intelligence Hub</h1>
+        <p>Healthcare Administration Portal</p>
+      </div>
+
+      {/* Login Card */}
       <div className="login-card">
-        <h2>Admin Login</h2>
+        <h2>Sign In</h2>
+        
         <form onSubmit={handleSubmit}>
           <div className="form-group">
-            <label htmlFor="email">Email</label>
-            <input
-              type="email"
-              id="email"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              placeholder="admin@admin.com"
-            />
+            <label htmlFor="email">Email Address</label>
+            <div className="input-wrapper">
+              <Mail />
+              <input
+                type="email"
+                id="email"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                placeholder="Enter your email"
+              />
+            </div>
           </div>
+
           <div className="form-group">
             <label htmlFor="password">Password</label>
-            <input
-              type="password"
-              id="password"
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              placeholder="Enter password"
-            />
+            <div className="input-wrapper">
+              <Lock />
+              <input
+                type="password"
+                id="password"
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                placeholder="Enter your password"
+              />
+            </div>
           </div>
+
+          <div className="form-row">
+            <label className="checkbox-wrapper">
+              <input 
+                type="checkbox" 
+                checked={rememberMe}
+                onChange={(e) => setRememberMe(e.target.checked)}
+              />
+              Remember me
+            </label>
+            <a href="#" className="forgot-link">Forgot password?</a>
+          </div>
+
           <button type="submit" className="btn btn-primary" disabled={loading}>
-            {loading ? 'Logging in...' : 'Login'}
+            {loading ? 'Signing in...' : 'Sign In'}
           </button>
         </form>
-        <p style={{ marginTop: '1rem', textAlign: 'center', color: '#6c757d', fontSize: '0.9rem' }}>
-          Default credentials: admin@admin.com / admin123
-        </p>
+
+        <div className="divider">
+          <span>or</span>
+        </div>
+
+        <button type="button" className="btn btn-outline">
+          <Key size={18} />
+          Sign in with SSO
+        </button>
+
+        <div className="login-footer">
+          New to Clinical Intelligence Hub? <a href="#">Request Access</a>
+        </div>
+      </div>
+
+      {/* Bottom Footer */}
+      <div className="login-bottom-footer">
+        <div className="compliance-badges">
+          <span><Shield size={14} /> HIPAA Compliant</span>
+          <span><CheckCircle size={14} /> SOC 2 Certified</span>
+          <span><CheckCircle size={14} /> ISO 27001</span>
+        </div>
+        <div className="footer-links">
+          <a href="#">Privacy Policy</a>
+          <a href="#">Terms of Service</a>
+          <a href="#">Support</a>
+        </div>
       </div>
     </div>
   );

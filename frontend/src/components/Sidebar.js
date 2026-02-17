@@ -5,8 +5,8 @@ import {
   Users, 
   UserCog, 
   LogOut, 
-  Menu,
-  X
+  X,
+  Activity
 } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 
@@ -41,34 +41,43 @@ const Sidebar = ({ collapsed, setCollapsed, mobileOpen, setMobileOpen }) => {
       
       <aside className={`sidebar ${collapsed ? 'collapsed' : ''} ${mobileOpen ? 'mobile-open' : ''}`}>
         <div className="sidebar-header">
-          <h1>Admin Panel</h1>
-          <button className="toggle-btn" onClick={() => {
-            if (window.innerWidth <= 768) {
-              setMobileOpen(false);
-            } else {
-              setCollapsed(!collapsed);
-            }
-          }}>
-            {mobileOpen || !collapsed ? <X size={20} /> : <Menu size={20} />}
-          </button>
+          <div className="sidebar-logo">
+            <Activity />
+          </div>
+          <div className="sidebar-header-text">
+            <h1>Clinical Hub</h1>
+            <p>Admin Portal</p>
+          </div>
+          {mobileOpen && (
+            <button className="toggle-btn" onClick={() => setMobileOpen(false)}>
+              <X size={18} />
+            </button>
+          )}
         </div>
         
         <nav className="sidebar-nav">
-          {navItems.map((item) => (
-            <NavLink
-              key={item.path}
-              to={item.path}
-              className={({ isActive }) => `nav-item ${isActive ? 'active' : ''}`}
-              onClick={handleNavClick}
-            >
-              <item.icon size={24} />
-              <span>{item.label}</span>
-            </NavLink>
-          ))}
+          <div className="nav-section">
+            <span className="nav-section-title">Main Menu</span>
+            {navItems.map((item) => (
+              <NavLink
+                key={item.path}
+                to={item.path}
+                className={({ isActive }) => `nav-item ${isActive ? 'active' : ''}`}
+                onClick={handleNavClick}
+              >
+                <item.icon size={22} />
+                <span>{item.label}</span>
+              </NavLink>
+            ))}
+          </div>
           
-          <div className="nav-item" onClick={handleLogout} style={{ marginTop: 'auto', cursor: 'pointer' }}>
-            <LogOut size={24} />
-            <span>Logout</span>
+          <div className="nav-spacer" />
+          
+          <div className="nav-section">
+            <div className="nav-item logout" onClick={handleLogout}>
+              <LogOut size={22} />
+              <span>Logout</span>
+            </div>
           </div>
         </nav>
       </aside>

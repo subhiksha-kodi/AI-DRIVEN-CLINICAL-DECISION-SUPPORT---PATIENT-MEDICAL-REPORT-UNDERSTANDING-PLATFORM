@@ -148,7 +148,10 @@ const Dashboard = () => {
   return (
     <div>
       <div className="page-header">
-        <h2>Dashboard</h2>
+        <div>
+          <h2>Dashboard</h2>
+          <p className="page-header-subtitle">Overview of your healthcare management system</p>
+        </div>
       </div>
 
       {/* Stats Cards */}
@@ -197,7 +200,7 @@ const Dashboard = () => {
       {/* Upload Section */}
       <div className="card">
         <div className="card-header">
-          <h3>Upload Lab Report</h3>
+          <h3><Upload size={20} /> Upload Lab Report</h3>
         </div>
         <form className="upload-form" onSubmit={handleUpload}>
           <div className="form-group">
@@ -263,7 +266,8 @@ const Dashboard = () => {
       {/* Search Section */}
       <div className="card">
         <div className="card-header">
-          <h3>Recently Uploaded Reports</h3>
+          <h3><FileText size={20} /> Recently Uploaded Reports</h3>
+          {totalReports > 0 && <span className="report-count">{totalReports} reports</span>}
         </div>
         
         <div className="search-bar">

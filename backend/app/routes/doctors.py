@@ -1,7 +1,7 @@
 from fastapi import APIRouter, Depends, HTTPException, status, Query
 from sqlalchemy.orm import Session
-from sqlalchemy import func
-from typing import List
+from sqlalchemy import func, or_
+from typing import List, Optional
 from app.database import get_db
 from app.models.doctor import Doctor, DoctorStatus
 from app.schemas.doctor import DoctorResponse, DoctorListResponse
@@ -13,19 +13,49 @@ router = APIRouter(prefix="/admin/doctors", tags=["Manage Doctors"])
 def get_all_doctors(
     page: int = Query(1, ge=1),
     limit: int = Query(10, ge=1, le=100),
+    search: Optional[str] = Query(None),
     db: Session = Depends(get_db),
     _: dict = Depends(verify_admin_token)
 ):
     offset = (page - 1) * limit
-    doctors = db.query(Doctor).order_by(Doctor.created_at.desc()).offset(offset).limit(limit).all()
+    query = db.query(Doctor)
+    
+    if search:
+        search_filter = f"%{search}%"
+        query = query.filter(
+            or_(
+                Doctor.name.ilike(search_filter),
+                Doctor.email.ilike(search_filter),
+                Doctor.specialization.ilike(search_filter),
+                Doctor.registration_id.ilike(search_filter),
+                Doctor.phone.ilike(search_filter)
+            )
+        )
+    
+    doctors = query.order_by(Doctor.created_at.desc()).offset(offset).limit(limit).all()
     return doctors
 
 @router.get("/count")
 def get_doctors_count(
+    search: Optional[str] = Query(None),
     db: Session = Depends(get_db),
     _: dict = Depends(verify_admin_token)
 ):
-    total = db.query(func.count(Doctor.id)).scalar()
+    query = db.query(func.count(Doctor.id))
+    
+    if search:
+        search_filter = f"%{search}%"
+        query = query.filter(
+            or_(
+                Doctor.name.ilike(search_filter),
+                Doctor.email.ilike(search_filter),
+                Doctor.specialization.ilike(search_filter),
+                Doctor.registration_id.ilike(search_filter),
+                Doctor.phone.ilike(search_filter)
+            )
+        )
+    
+    total = query.scalar()
     return {"total": total or 0}
 
 @router.get("/approved", response_model=List[DoctorListResponse])

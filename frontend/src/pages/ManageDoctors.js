@@ -5,19 +5,22 @@ import {
   Check,
   X,
   ChevronLeft,
-  ChevronRight
+  ChevronRight,
+  Search
 } from 'lucide-react';
 import { 
   getDoctors, 
   getDoctorsCount, 
   approveDoctor, 
-  rejectDoctor 
+  rejectDoctor,
+  searchDoctors
 } from '../services/api';
 
 const ManageDoctors = () => {
   const [doctors, setDoctors] = useState([]);
   const [totalDoctors, setTotalDoctors] = useState(0);
   const [currentPage, setCurrentPage] = useState(1);
+  const [searchQuery, setSearchQuery] = useState('');
   const [loading, setLoading] = useState(true);
   const [actionLoading, setActionLoading] = useState(null);
 
@@ -27,8 +30,8 @@ const ManageDoctors = () => {
     setLoading(true);
     try {
       const [doctorsData, countData] = await Promise.all([
-        getDoctors(currentPage, limit),
-        getDoctorsCount()
+        getDoctors(currentPage, limit, searchQuery),
+        getDoctorsCount(searchQuery)
       ]);
       
       setDoctors(doctorsData);
@@ -38,11 +41,20 @@ const ManageDoctors = () => {
     } finally {
       setLoading(false);
     }
-  }, [currentPage]);
+  }, [currentPage, searchQuery]);
 
   useEffect(() => {
     fetchDoctors();
   }, [fetchDoctors]);
+
+  useEffect(() => {
+    const timeoutId = setTimeout(() => {
+      setCurrentPage(1);
+      fetchDoctors();
+    }, 500);
+
+    return () => clearTimeout(timeoutId);
+  }, [searchQuery]);
 
   const handleApprove = async (doctorId) => {
     setActionLoading(doctorId);
@@ -84,12 +96,26 @@ const ManageDoctors = () => {
   return (
     <div>
       <div className="page-header">
-        <h2>Manage Doctors</h2>
+        <div>
+          <h2>Manage Doctors</h2>
+          <p className="page-header-subtitle">View and approve doctor registrations</p>
+        </div>
       </div>
 
       <div className="card">
         <div className="card-header">
-          <h3>All Doctors ({totalDoctors})</h3>
+          <h3><UserCog size={20} /> All Doctors</h3>
+          <span className="report-count">{totalDoctors} total</span>
+        </div>
+
+        <div className="search-bar">
+          <Search size={20} />
+          <input
+            type="text"
+            placeholder="Search by doctor name, email, specialization, or registration ID..."
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+          />
         </div>
 
         {loading ? (

@@ -60,12 +60,16 @@ const ManagePatients = () => {
   return (
     <div>
       <div className="page-header">
-        <h2>Manage Patients</h2>
+        <div>
+          <h2>Manage Patients</h2>
+          <p className="page-header-subtitle">View and manage patient records</p>
+        </div>
       </div>
 
       <div className="card">
         <div className="card-header">
-          <h3>All Patients ({totalPatients})</h3>
+          <h3><Users size={20} /> All Patients</h3>
+          <span className="report-count">{totalPatients} total</span>
         </div>
 
         <div className="search-bar">
@@ -111,13 +115,7 @@ const ManagePatients = () => {
                           : '-'}
                       </td>
                       <td>
-                        <span style={{
-                          background: '#e8f4fd',
-                          color: '#1e3a5f',
-                          padding: '0.25rem 0.75rem',
-                          borderRadius: '50px',
-                          fontWeight: '600'
-                        }}>
+                        <span className="report-count">
                           {patient.total_reports}
                         </span>
                       </td>

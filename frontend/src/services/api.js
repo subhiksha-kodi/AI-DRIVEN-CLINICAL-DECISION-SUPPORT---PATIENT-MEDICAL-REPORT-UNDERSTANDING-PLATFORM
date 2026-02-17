@@ -66,13 +66,26 @@ export const searchReports = async (query) => {
 };
 
 // Doctors APIs
-export const getDoctors = async (page = 1, limit = 10) => {
-  const response = await api.get(`/admin/doctors?page=${page}&limit=${limit}`);
+export const getDoctors = async (page = 1, limit = 10, search = '') => {
+  let url = `/admin/doctors?page=${page}&limit=${limit}`;
+  if (search) {
+    url += `&search=${encodeURIComponent(search)}`;
+  }
+  const response = await api.get(url);
   return response.data;
 };
 
-export const getDoctorsCount = async () => {
-  const response = await api.get('/admin/doctors/count');
+export const getDoctorsCount = async (search = '') => {
+  let url = '/admin/doctors/count';
+  if (search) {
+    url += `?search=${encodeURIComponent(search)}`;
+  }
+  const response = await api.get(url);
+  return response.data;
+};
+
+export const searchDoctors = async (query) => {
+  const response = await api.get(`/admin/doctors/search?query=${encodeURIComponent(query)}`);
   return response.data;
 };
 

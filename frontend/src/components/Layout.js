@@ -4,7 +4,7 @@ import { Menu } from 'lucide-react';
 import Sidebar from './Sidebar';
 
 const Layout = () => {
-  const [collapsed, setCollapsed] = useState(false);
+  const [collapsed, setCollapsed] = useState(true);
   const [mobileOpen, setMobileOpen] = useState(false);
 
   return (
