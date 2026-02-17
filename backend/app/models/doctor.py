@@ -25,3 +25,4 @@ class Doctor(Base):
     # Relationships
     patients = relationship("Patient", back_populates="doctor")
     reports = relationship("Report", back_populates="doctor")
+    reviews = relationship("ReportReview", back_populates="doctor")

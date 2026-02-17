@@ -3,7 +3,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from fastapi.staticfiles import StaticFiles
 import os
 from app.database import engine, Base
-from app.routes import auth_router, admin_router, doctors_router, patients_router
+from app.routes import auth_router, admin_router, doctors_router, patients_router, doctor_portal_router
 from app.config import settings
 
 # Create database tables
@@ -33,6 +33,7 @@ app.include_router(auth_router)
 app.include_router(admin_router)
 app.include_router(doctors_router)
 app.include_router(patients_router)
+app.include_router(doctor_portal_router)
 
 @app.get("/")
 def root():

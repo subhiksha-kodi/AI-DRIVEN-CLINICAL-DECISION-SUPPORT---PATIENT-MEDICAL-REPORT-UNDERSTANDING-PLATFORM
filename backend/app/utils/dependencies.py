@@ -61,3 +61,48 @@ async def verify_admin_token(
         )
     
     return payload
+
+
+async def verify_doctor_token(
+    credentials: HTTPAuthorizationCredentials = Depends(security),
+    db: Session = Depends(get_db)
+) -> Doctor:
+    """Verify doctor token and return doctor object"""
+    token = credentials.credentials
+    payload = decode_token(token)
+    
+    if payload is None:
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="Invalid token",
+            headers={"WWW-Authenticate": "Bearer"},
+        )
+    
+    if payload.get("role") != "doctor":
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail="Doctor access required",
+        )
+    
+    doctor_id = payload.get("sub")
+    if doctor_id is None:
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="Invalid token",
+        )
+    
+    doctor = db.query(Doctor).filter(Doctor.id == int(doctor_id)).first()
+    if doctor is None:
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="Doctor not found",
+        )
+    
+    # Verify doctor is still approved
+    if doctor.status != "Approved":
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail="Doctor account is not approved",
+        )
+    
+    return doctor

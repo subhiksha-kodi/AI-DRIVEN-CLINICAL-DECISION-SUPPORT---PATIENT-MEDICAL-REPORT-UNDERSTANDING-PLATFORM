@@ -4,6 +4,7 @@ sqlalchemy==2.0.25
 psycopg2-binary==2.9.9
 python-jose[cryptography]==3.3.0
 passlib[bcrypt]==1.7.4
+bcrypt==4.0.1
 python-multipart==0.0.6
 pydantic[email]==2.5.3
 pydantic-settings==2.1.0
@@ -11,3 +12,26 @@ alembic==1.13.1
 python-dotenv==1.0.0
 aiofiles==23.2.1
 email-validator==2.1.0
+
+# OCR Dependencies
+numpy>=1.24.0,<2.0.0
+opencv-python-headless>=4.8.0,<4.10.0
+pytesseract==0.3.10
+pdf2image==1.16.3
+PyPDF2==3.0.1
+Pillow>=10.0.0
+
+# Layout Understanding & Document AI
+transformers>=4.36.0
+torch>=2.1.0
+torchvision>=0.16.0
+
+# Medical Spelling Correction
+rapidfuzz>=3.5.0
+
+# NLP Dependencies
+spacy>=3.7.0
+httpx>=0.25.0
+
+# AI Service
+openai>=1.10.0
