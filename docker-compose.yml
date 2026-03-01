@@ -1,0 +1,170 @@
+version: '3.9'
+
+networks:
+  doctor_net:
+  medical_net:
+
+volumes:
+  postgres_data:
+  doctor_uploads_data:
+  medical_uploads_data:
+
+services:
+  # ─── Shared Database ───────────────────────────────────────────────────────
+  postgres:
+    image: postgres:16-alpine
+    container_name: shared_postgres
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: clinical_db
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres123
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    ports:
+      - "5432:5432"
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres -d clinical_db"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      - doctor_net
+      - medical_net
+
+  # ─── Doctor Project Services ───────────────────────────────────────────────
+  doctor_extraction:
+    build:
+      context: ./doctor/backend/extraction-service
+      dockerfile: Dockerfile
+    container_name: doctor_extraction
+    restart: unless-stopped
+    environment:
+      PYTHONUNBUFFERED: 1
+    volumes:
+      - doctor_uploads_data:/app/uploads
+    ports:
+      - "8001:8001"
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8001/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+    networks:
+      doctor_net:
+        aliases:
+          - extraction
+
+  doctor_backend:
+    build:
+      context: ./doctor/backend
+      dockerfile: Dockerfile
+    container_name: doctor_backend
+    restart: unless-stopped
+    depends_on:
+      postgres:
+        condition: service_healthy
+      doctor_extraction:
+        condition: service_healthy
+    environment:
+      PORT: 5000
+      NODE_ENV: production
+      DB_HOST: postgres
+      DB_PORT: 5432
+      DB_NAME: clinical_db
+      DB_USER: postgres
+      DB_PASSWORD: postgres123
+      JWT_SECRET: super_secure_jwt_secret_change_in_production_2024
+      JWT_EXPIRES_IN: 7d
+      ADMIN_USERNAME: admin
+      ADMIN_PASSWORD: Admin@12345
+      EXTRACTION_SERVICE_URL: http://extraction:8001
+    volumes:
+      - doctor_uploads_data:/app/uploads
+    # Internal port inside network is 5000, mapped to host 5001
+    ports:
+      - "5001:5000"
+    healthcheck:
+      test: ["CMD-SHELL", "wget -qO- http://localhost:5000/health || exit 1"]
+      interval: 15s
+      timeout: 5s
+      retries: 5
+    networks:
+      doctor_net:
+        aliases:
+          - backend
+
+  doctor_frontend:
+    build:
+      context: ./doctor/frontend
+      dockerfile: Dockerfile
+    container_name: doctor_frontend
+    restart: unless-stopped
+    depends_on:
+      - doctor_backend
+    ports:
+      - "8081:80"
+    networks:
+      - doctor_net
+
+  # ─── Medical Project Services ──────────────────────────────────────────────
+  medical_backend:
+    build:
+      context: ./medical/backend
+      dockerfile: Dockerfile
+    container_name: medical_backend
+    restart: unless-stopped
+    depends_on:
+      postgres:
+        condition: service_healthy
+    dns:
+      - 8.8.8.8
+      - 8.8.4.4
+    environment:
+      PORT: 5000
+      NODE_ENV: production
+      DB_HOST: postgres
+      DB_PORT: 5432
+      DB_NAME: clinical_db
+      DB_USER: postgres
+      DB_PASSWORD: postgres123
+      JWT_SECRET: super_secure_jwt_secret_change_in_production_2024
+      JWT_EXPIRES_IN: 7d
+      ADMIN_USERNAME: admin
+      ADMIN_PASSWORD: Admin@12345
+      # Groq API Key for document extraction (OCR for prescriptions & lab reports)
+      GROQ_API_KEY: ${GROQ_API_KEY}
+      GROQ_MODEL: meta-llama/llama-4-scout-17b-16e-instruct
+      # OpenRouter API Key for clinical AI analysis
+      OPENROUTER_API_KEY: ${OPENROUTER_API_KEY}
+      OPENROUTER_MODEL: anthropic/claude-3.5-sonnet
+    volumes:
+      - medical_uploads_data:/app/uploads
+      - ./medical/backend/src:/app/src:ro
+      - ./medical/backend/extraction-service:/app/extraction-service:ro
+    ports:
+      - "5002:5000"
+    healthcheck:
+      test: ["CMD-SHELL", "wget -qO- http://localhost:5000/health || exit 1"]
+      interval: 15s
+      timeout: 5s
+      retries: 5
+    networks:
+      medical_net:
+        aliases:
+          - backend
+
+  medical_frontend:
+    build:
+      context: ./medical/frontend
+      dockerfile: Dockerfile
+      args:
+        VITE_API_URL: /api
+    container_name: medical_frontend
+    restart: unless-stopped
+    depends_on:
+      - medical_backend
+    ports:
+      - "8082:80"
+    networks:
+      - medical_net

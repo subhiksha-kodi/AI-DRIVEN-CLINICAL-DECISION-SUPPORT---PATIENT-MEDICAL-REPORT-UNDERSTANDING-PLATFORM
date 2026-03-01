@@ -1,0 +1,47 @@
+# Development Docker Compose with hot-reloading
+# Usage: docker-compose -f docker-compose.yml -f docker-compose.dev.yml up --build
+
+version: '3.9'
+
+services:
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile.dev
+    environment:
+      NODE_ENV: development
+      # Groq API Key for document extraction (prescriptions & lab reports)
+      GROQ_API_KEY: ${GROQ_API_KEY}
+      GROQ_MODEL: ${GROQ_MODEL:-meta-llama/llama-4-scout-17b-16e-instruct}
+      # OpenRouter API Key for clinical analysis
+      OPENROUTER_API_KEY: ${OPENROUTER_API_KEY}
+      OPENROUTER_MODEL: ${OPENROUTER_MODEL:-anthropic/claude-3.5-sonnet}
+    volumes:
+      # Mount source code for hot-reloading
+      - ./backend/src:/app/src
+      - ./backend/server.js:/app/server.js
+      - ./backend/extraction-service:/app/extraction-service
+      # Persist uploads
+      - uploads_data:/app/uploads
+      # Prevent node_modules from being overwritten
+      - /app/node_modules
+    command: npm run dev
+
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile.dev
+    volumes:
+      # Mount source code for hot-reloading
+      - ./frontend/src:/app/src
+      - ./frontend/index.html:/app/index.html
+      - ./frontend/vite.config.js:/app/vite.config.js
+      - ./frontend/tailwind.config.js:/app/tailwind.config.js
+      # Prevent node_modules from being overwritten
+      - /app/node_modules
+    ports:
+      - "5173:5173"
+    environment:
+      - VITE_API_URL=http://localhost:5000/api
+    depends_on:
+      - backend

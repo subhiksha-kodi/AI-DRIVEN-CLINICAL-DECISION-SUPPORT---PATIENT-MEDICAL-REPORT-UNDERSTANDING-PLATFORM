@@ -1,0 +1,160 @@
+/* Clinical Intelligence Platform - Global styles */
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap');
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  * {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+  }
+
+  body {
+    font-family: 'Inter', system-ui, sans-serif;
+    background-color: #f1f5f9;
+    color: #1e293b;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  ::-webkit-scrollbar {
+    width: 5px;
+    height: 5px;
+  }
+
+  ::-webkit-scrollbar-track {
+    background: #f1f5f9;
+  }
+
+  ::-webkit-scrollbar-thumb {
+    background: #94a3b8;
+    border-radius: 99px;
+  }
+}
+
+@layer components {
+
+  /* Sidebar */
+  .sidebar {
+    @apply fixed left-0 top-0 h-full bg-slate-900 z-50 transition-all duration-300 ease-in-out overflow-hidden flex flex-col;
+    width: 64px;
+    /* collapsed: icon only */
+    box-shadow: 4px 0 20px rgba(0, 0, 0, 0.25);
+  }
+
+  .sidebar:hover,
+  .sidebar.expanded {
+    width: 260px;
+  }
+
+  .sidebar-label {
+    @apply whitespace-nowrap overflow-hidden transition-all duration-300 opacity-0;
+    max-width: 0;
+  }
+
+  .sidebar:hover .sidebar-label,
+  .sidebar.expanded .sidebar-label {
+    @apply opacity-100;
+    max-width: 200px;
+  }
+
+  /* Doctor Sidebar */
+  .doctor-sidebar {
+    @apply fixed left-0 top-0 h-full bg-slate-900 z-50 transition-all duration-300 ease-in-out overflow-hidden flex flex-col;
+    width: 64px;
+    box-shadow: 4px 0 20px rgba(0, 0, 0, 0.25);
+  }
+
+  .doctor-sidebar:hover,
+  .doctor-sidebar.expanded {
+    width: 260px;
+  }
+
+  .doctor-sidebar .sidebar-label {
+    @apply whitespace-nowrap overflow-hidden transition-all duration-300 opacity-0;
+    max-width: 0;
+  }
+
+  .doctor-sidebar:hover .sidebar-label,
+  .doctor-sidebar.expanded .sidebar-label {
+    @apply opacity-100;
+    max-width: 200px;
+  }
+
+  /* Main content area shifts on hover */
+  .main-content {
+    @apply transition-all duration-300 ease-in-out;
+    margin-left: 64px;
+  }
+
+  /* Sync shift with sidebar hover/expansion */
+  .sidebar:hover ~ .main-content,
+  .sidebar.expanded ~ .main-content,
+  .doctor-sidebar:hover ~ .main-content,
+  .doctor-sidebar.expanded ~ .main-content {
+    margin-left: 260px;
+  }
+
+  /* Stat card */
+  .stat-card {
+    @apply bg-white rounded-2xl p-6 shadow-card hover:shadow-card-hover transition-all duration-300 hover:-translate-y-1 cursor-default;
+  }
+
+  /* Action button */
+  .btn-primary {
+    @apply bg-blue-600 hover:bg-blue-700 text-white font-medium px-4 py-2 rounded-lg transition-colors duration-200;
+  }
+
+  .btn-danger {
+    @apply bg-red-500 hover:bg-red-600 text-white font-medium px-3 py-1.5 rounded-lg transition-colors duration-200 text-sm;
+  }
+
+  .btn-success {
+    @apply bg-emerald-500 hover:bg-emerald-600 text-white font-medium px-3 py-1.5 rounded-lg transition-colors duration-200 text-sm;
+  }
+
+  .btn-ghost {
+    @apply bg-slate-100 hover:bg-slate-200 text-slate-700 font-medium px-3 py-1.5 rounded-lg transition-colors duration-200 text-sm;
+  }
+
+  /* Table */
+  .data-table {
+    @apply w-full text-sm text-left;
+  }
+
+  .data-table th {
+    @apply bg-slate-50 text-slate-500 font-semibold text-xs uppercase tracking-wider px-4 py-3 border-b border-slate-200;
+  }
+
+  .data-table td {
+    @apply px-4 py-3 border-b border-slate-100 text-slate-700;
+  }
+
+  .data-table tr:hover td {
+    @apply bg-blue-50;
+  }
+
+  /* Badge */
+  .badge {
+    @apply inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-semibold;
+  }
+
+  .badge-pending {
+    @apply bg-amber-100 text-amber-700;
+  }
+
+  .badge-approved {
+    @apply bg-emerald-100 text-emerald-700;
+  }
+
+  .badge-rejected {
+    @apply bg-red-100 text-red-700;
+  }
+
+  /* Input */
+  .input-field {
+    @apply w-full border border-slate-200 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-blue-300 focus:border-blue-400 transition bg-white text-slate-800 placeholder:text-slate-400;
+  }
+}

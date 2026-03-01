@@ -1,0 +1,1 @@
+﻿{"patient_info":{"name":"Test","age":"30","sex":"Male"},"lab_tests":[{"test_name":"HB","value":"12","unit":"g/dL"}],"computed_risk":{"risk_level":"LOW","risk_score":10}}
